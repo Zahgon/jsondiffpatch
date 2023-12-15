@@ -1,4 +1,4 @@
-name: Node.js CI
+name: Rust CI
 
 on:
   push:
@@ -11,22 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 'lts/*'
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build
-        working-directory: ./packages/jsondiffpatch
-      - run: npm run test
-        working-directory: ./packages/jsondiffpatch
-      - run: npm run lint
-        working-directory: ./packages/jsondiffpatch
-      - run: npm run format-check
-      - run: npm run start
-        working-directory: ./demos/console-demo
-      - run: npm run build
-        working-directory: ./demos/html-demo
-      - run: npm run start
-        working-directory: ./demos/numeric-plugin-demo
+      - uses: actions/checkout@v4
+      - run: rustup component add rustfmt clippy
+      - run: cargo build --release --locked
+      - run: cargo test --release --locked
+      - run: cargo fmt --check
+      - run: cargo clippy --all-targets --locked -- -D warnings
